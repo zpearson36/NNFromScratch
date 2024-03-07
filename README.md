@@ -7,3 +7,13 @@ more flexible application of the concepts
 I will be following along with the following youtube playlist:
 
 [https://www.youtube.com/playlist?list=PLQVvvaa0QuDcjD5BAw2DxE6OF2tius3v3](https://www.youtube.com/playlist?list=PLQVvvaa0QuDcjD5BAw2DxE6OF2tius3V3)
+
+
+UPDATE:
+
+I will no longer be following the above tutorial as it is incomplete and does
+not look to be completed in the near future.
+
+As a result I will be changing tutorials to the Coding Train tutorial found here:
+
+[]()
