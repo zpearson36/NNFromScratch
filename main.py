@@ -7,7 +7,7 @@ if __name__ == '__main__':
 
     data_set = []
 
-    with open('/home/notabot/Projects/data_sets/optdigits.tes') as f:
+    with open('.ignore/optdigits.tes') as f:
         lines = f.readlines()
 
     for line in lines:
