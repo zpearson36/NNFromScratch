@@ -1,23 +1,34 @@
 import activation_functions as af
-import layer
-
-import nnfs
-from nnfs.datasets import spiral_data
+import MLperceptron as mlp
 
 if __name__ == '__main__':
-    nnfs.init()
+    a_function = af.ActivationFunction("sigmoid")
+    brain = mlp.MLPerceptron(64, 64, 10, a_function)
 
-    X = [
-          [1, 2, 3, 2.5],
-          [2.0, 5.0, -1.0, 2.0],
-          [-1.5, 2.7, 3.3, -0.8]
-             ]
+    data_set = []
 
-    X, y = spiral_data(100,3)
-    a_function = af.ActivationFunction("rectifiedlinear")
-    layer1 = layer.LayerDense(2, 5)
-    layer1.forward(X)
-    print(layer1.output)
-    a_function.forward(layer1.output)
-    print(a_function.output)
-    
+    with open('/home/notabot/Projects/data_sets/optdigits.tes') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        line = line.strip('\n')
+        line = line.split(",")
+        line = [eval(i) for i in line]
+        digit = line.pop(-1)
+        _class = [0] * 10
+        _class[digit] = 1
+        data_set.append((line, _class))
+
+    print(len(data_set))
+    correct, incorrect = brain.test(data_set[1000:])
+    print("========Before Training=======")
+    print(f"{(correct / (correct + incorrect)) * 100}% accurate")
+    print(f"Correct: {correct}")
+    print(f"Incorrect: {incorrect}")
+    brain.train(data_set[:999])
+    correct, incorrect = brain.test(data_set[1000:])
+    print("========After Training=======")
+    print(f"{(correct / (correct + incorrect)) * 100}% accurate")
+    print(f"Correct: {correct}")
+    print(f"Incorrect: {incorrect}")
+
