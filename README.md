@@ -17,3 +17,5 @@ not look to be completed in the near future.
 As a result I will be changing tutorials to the Coding Train tutorial found here:
 
 [https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aCibgK1PTWWu9by6XFdCfh](https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aCibgK1PTWWu9by6XFdCfh)
+
+Handwritten digit data: [http://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits](http://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits)
