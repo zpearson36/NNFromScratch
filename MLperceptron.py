@@ -11,7 +11,6 @@ class MLPerceptron:
         self.num_hidden = num_hidden
         self.num_output = num_output
         self.input_weights = np.random.uniform(-1, 1, (self.num_inputs, self.num_hidden))
-        #self.output_weights = np.full((self.num_hidden, self.num_output), 1)
         self.output_weights = np.random.uniform(-1, 1, (self.num_hidden, self.num_output))
         self.input_biases = np.full((self.num_hidden), 1)
         self.output_biases = np.full(1, (self.num_output))
@@ -34,26 +33,12 @@ class MLPerceptron:
             self.forward(inputs)
             errors = np.array(classification) - np.array(self.output)
 
-            # e_list = np.divide(np.multiply(self.output_weights, error), self.output_weights.sum())
-            # self.input_weights += np.multiply(np.dot(self.input_weights, e_list), self.learning_rate)
-            # self.output_weights += np.multiply(np.dot(self.a_function.output, self.output_weights), self.learning_rate)
+            e_list = np.divide(np.multiply(self.output_weights, errors), self.output_weights.sum())
+            self.output_weights += np.multiply(e_list, self.learning_rate)
 
-            e_list = []
-            for weight in self.output_weights:
-                e_val = 0
-                for w, error in zip(weight, errors):
-                    e_val += (w / self.output_weights.sum()) * error
-                e_list.append(e_val)
-
-            for inpt, weights in zip(inputs, self.input_weights):
-                for error, weight in zip(e_list, weights):
-                    x = np.multiply(np.multiply(inpt, error), self.learning_rate)
-                    weight += x
-
-
-            for weight, output in zip(self.output_weights, self.a_function.output):
-                weight += np.multiply(np.multiply(output, error), self.learning_rate)
-            
+            e_list = np.dot(np.array(errors), self.output_weights.T)
+            e_list = np.divide(np.multiply(self.input_weights, e_list), self.input_weights.sum())
+            self.input_weights += np.multiply(e_list, self.learning_rate)
 
     def test(self, test_data):
         correct = 0
@@ -73,7 +58,6 @@ class MLPerceptron:
 
 
 if __name__ == "__main__":
-    #afunction = af.ActivationFunction("rectifiedlinear")
     afunction = af.ActivationFunction("sigmoid")
     ml = MLPerceptron(2, 40, 1, afunction)
 

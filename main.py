@@ -2,8 +2,8 @@ import activation_functions as af
 import MLperceptron as mlp
 
 if __name__ == '__main__':
-    a_function = af.ActivationFunction("sigmoid")
-    brain = mlp.MLPerceptron(64, 64, 10, a_function)
+    a_function = af.ActivationFunction("rectifiedlinear")
+    brain = mlp.MLPerceptron(64, 640, 10, a_function)
 
     data_set = []
 
