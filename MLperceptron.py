@@ -11,44 +11,45 @@ class MLPerceptron:
         self.num_hidden = num_hidden
         self.num_output = num_output
         self.input_weights = np.random.uniform(-1, 1, (self.num_inputs, self.num_hidden))
-        #self.output_weights = np.full((self.num_hidden, self.num_output), 1)
         self.output_weights = np.random.uniform(-1, 1, (self.num_hidden, self.num_output))
-        self.input_biases = np.full((self.num_hidden), 2)
-        self.output_biases = np.full((self.num_output), 0)
+        self.input_biases = np.full((self.num_hidden), 1)
+        self.output_biases = np.full(1, (self.num_output))
         self.a_function = activation_function
-        self.learning_rate = .01
+        self.learning_rate = 1
 
     def forward(self, inputs):
         assert len(inputs) == self.num_inputs
         self.a_function.forward(
             np.dot(self.input_weights.T, np.array(inputs)) + self.input_biases
             )
-        self.output = self.a_function.step_function(np.dot(self.output_weights.T, np.array(self.a_function.output).reshape((self.num_hidden,1))) + self.output_biases)
+        self.output = self.a_function.step_function(
+                np.dot(self.output_weights.T,
+                       np.array(self.a_function.output).reshape((self.num_hidden,1))
+                       ) + self.output_biases
+                )
 
     def train(self, training_data):
         for inputs, classification in training_data:
             self.forward(inputs)
-            error = classification - self.output[0]
-            
-            e_list = []
+            errors = np.array(classification) - np.array(self.output)
 
-            for weight in self.output_weights:
-                e_list.append((weight / self.output_weights.sum()) * error)
+            e_list = np.divide(np.multiply(self.output_weights, errors), self.output_weights.sum())
+            self.output_weights += np.multiply(e_list, self.learning_rate)
 
-            for i, weights in enumerate(self.input_weights):
-                for j, weight in enumerate(weights):
-                    weight += np.multiply(np.multiply(inputs[i], e_list[j])[0], self.learning_rate)
-
-            for weight, output in zip(self.output_weights, self.a_function.output):
-                weight += np.multiply(np.multiply(output, error), self.learning_rate)
-            
+            e_list = np.dot(np.array(errors), self.output_weights.T)
+            e_list = np.divide(np.multiply(self.input_weights, e_list), self.input_weights.sum())
+            self.input_weights += np.multiply(e_list, self.learning_rate)
 
     def test(self, test_data):
         correct = 0
         incorrect = 0
         for point, classification in test_data:
             self.forward(point)
-            if(self.output[0] == classification):
+            matches = True
+            for output, _class in zip(self.output, classification):
+                matches = False if output != _class else True
+
+            if(matches):
                 correct += 1
             else:
                 incorrect += 1
@@ -57,7 +58,6 @@ class MLPerceptron:
 
 
 if __name__ == "__main__":
-    #afunction = af.ActivationFunction("rectifiedlinear")
     afunction = af.ActivationFunction("sigmoid")
     ml = MLPerceptron(2, 40, 1, afunction)
 
@@ -86,9 +86,9 @@ if __name__ == "__main__":
         for point in data:
             classification = [point]
             if point[1] > curve(point[0], coeffs):
-                classification.append(1)
+                classification.append([1])
             else:
-                classification.append(0)
+                classification.append([0])
             classified_data.append(classification)
         return classified_data
 
