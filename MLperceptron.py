@@ -1,7 +1,9 @@
 import activation_functions as af
 
+import json
 import math
 import numpy as np
+import os
 
 
 class MLPerceptron:
@@ -15,7 +17,7 @@ class MLPerceptron:
         self.input_biases = np.full((self.num_hidden), 1)
         self.output_biases = np.full(1, (self.num_output))
         self.a_function = activation_function
-        self.learning_rate = 1
+        self.learning_rate = .01
 
     def forward(self, inputs):
         assert len(inputs) == self.num_inputs
@@ -56,22 +58,54 @@ class MLPerceptron:
 
         return (correct, incorrect)
 
+    def save_weights(self, file):
+        weights_dict = {}
+        weights_dict["input"] = str(self.input_weights.tolist())
+        weights_dict["output"] = str(self.output_weights.tolist())
+        with open(file, "w") as f:
+            json.dump(weights_dict, f)
+
+        print(f"Weights Saved to {file}")
+
+    def load_weights(self, file):
+        with open(file, "r") as  f:
+            weights_json = json.load(f)
+        input_weights  = weights_json["input"].split("], [")
+        input_weights  = [weight.replace("[", "").replace("]", "") for weight in input_weights]
+        input_weights2 = []
+
+        for weights in input_weights:
+            input_weights2.append([float(weight) for weight in weights.split(', ')])
+
+        self.input_weights = np.array(input_weights2)
+
+        output_weights  = weights_json["output"].split("], [")
+        output_weights  = [weight.replace("[", "").replace("]", "") for weight in output_weights]
+        output_weights2 = []
+
+        for weights in output_weights:
+            output_weights2.append([float(weight) for weight in weights.split(', ')])
+
+        self.output_weights = np.array(output_weights2)
+
+        print("Weights loaded")
+
 
 if __name__ == "__main__":
-    afunction = af.ActivationFunction("sigmoid")
-    ml = MLPerceptron(2, 40, 1, afunction)
+
+    hidden_layer_size = 40
+    function = "x2"
+
+    afunction = af.ActivationFunction("rectifiedlinear")
+    ml = MLPerceptron(2, hidden_layer_size, 1, afunction)
 
     data_set = np.random.uniform(-1, 1, (1000, 2)) * 100
+    weights_path = f".ignore/weights_{function}_{hidden_layer_size}"
+    if(os.path.isfile(weights_path)):
+        ml.load_weights(weights_path)
 
-    degree = np.random.randint(1, 20) 
-    coeffs = np.random.uniform(-100, 100, (degree))
-
-    def f(x, coeffs):
-        y = 0
-        for power, coeff in enumerate(coeffs):
-            y += coeff * x ** power
-
-        return y
+    def f(x):
+        return x**2
 
     def data_classification(data, curve):
         '''
@@ -85,7 +119,7 @@ if __name__ == "__main__":
         classified_data = []
         for point in data:
             classification = [point]
-            if point[1] > curve(point[0], coeffs):
+            if point[1] > curve(point[0]):
                 classification.append([1])
             else:
                 classification.append([0])
@@ -104,3 +138,5 @@ if __name__ == "__main__":
     print(f"{(correct / (correct + incorrect)) * 100}% accurate")
     print(f"Correct: {correct}")
     print(f"Incorrect: {incorrect}")
+    if((correct / (correct + incorrect)) >= .9):
+        ml.save_weights(weights_path)
