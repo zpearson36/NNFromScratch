@@ -42,6 +42,7 @@ class ActivationFunction:
     
     def rect_linear(self, inputs):
         output = []
+        print(f"activation: {inputs}")
         for i in inputs:
             output.append(np.maximum(0, i))
         return output

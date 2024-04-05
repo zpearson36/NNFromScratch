@@ -24,7 +24,13 @@ class MLPerceptron:
         self.a_function.forward(
             np.dot(self.input_weights.T, np.array(inputs)) + self.input_biases
             )
-        self.output = self.a_function.step_function(
+        a = self.output_weights.T
+        b = np.array(self.a_function.output).reshape((self.num_hidden,1))
+        #print(a.shape)
+        #print(b.shape)
+        #print(np.dot(a, b).shape)
+        #print("="*20)
+        self.output = self.a_function.rect_linear(
                 np.dot(self.output_weights.T,
                        np.array(self.a_function.output).reshape((self.num_hidden,1))
                        ) + self.output_biases
@@ -34,6 +40,9 @@ class MLPerceptron:
         for inputs, classification in training_data:
             self.forward(inputs)
             errors = np.array(classification) - np.array(self.output)
+            print(np.array(classification))
+            print(self.output)
+            print(errors)
 
             e_list = np.divide(np.multiply(self.output_weights, errors), self.output_weights.sum())
             self.output_weights += np.multiply(e_list, self.learning_rate)
@@ -48,7 +57,16 @@ class MLPerceptron:
         for point, classification in test_data:
             self.forward(point)
             matches = True
-            for output, _class in zip(self.output, classification):
+            index = 0
+
+            for indx, val in enumerate(self.output):
+                if(val > self.output[indx]):
+                    index = indx
+            prediction = [0] * len(self.output)
+            prediction[index] = 1
+            #print(f"{prediction}:{self.output}")
+
+            for output, _class in zip(prediction, classification):
                 matches = False if output != _class else True
 
             if(matches):
@@ -97,7 +115,7 @@ if __name__ == "__main__":
     function = "x2"
 
     afunction = af.ActivationFunction("rectifiedlinear")
-    ml = MLPerceptron(2, hidden_layer_size, 1, afunction)
+    ml = MLPerceptron(2, hidden_layer_size, 2, afunction)
 
     data_set = np.random.uniform(-1, 1, (1000, 2)) * 100
     weights_path = f".ignore/weights_{function}_{hidden_layer_size}"
@@ -120,9 +138,9 @@ if __name__ == "__main__":
         for point in data:
             classification = [point]
             if point[1] > curve(point[0]):
-                classification.append([1])
+                classification.append([1, 0])
             else:
-                classification.append([0])
+                classification.append([0, 1])
             classified_data.append(classification)
         return classified_data
 
